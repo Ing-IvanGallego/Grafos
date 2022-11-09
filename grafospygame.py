@@ -2,8 +2,6 @@ import pygame
 import networkx as nx
 import random
 
-
-
 def obtenerPosibleDestinio(nodoActual,aristas):
     posiblesDestinoNodoActual=[]
     for arista in aristas:
@@ -26,15 +24,12 @@ def nodoNoVisitado(lpd,aristas,listaVisitada):
                 break
         else:
             continue
-    print(len(nodoDestino))
     if len(nodoDestino)==0:
-        print("ingres")
         return random.choice(posiblesDestinoNodoActual),False
     else:
         return nodoDestino[0],True
 
 def camino(g, inicio, fin, visitados = None):
-    #g=(V,E) : V = [x1,...,xn] E \subset VxV
     vertices = g[0]
     aristas = g[1]
 
@@ -44,10 +39,7 @@ def camino(g, inicio, fin, visitados = None):
     visitados.append(inicio)
     if inicio == fin:
         return visitados
-
-    ''' Seleccionar todas las aristas que contengan x como primer elemento
-        y que no hayan sido visitadas 
-    '''
+    ''' Seleccionar todas las aristas que contengan x como primer elemento y que no hayan sido visitadas '''
     seleccion = [x for x in aristas if x[0] == inicio and x[1] not in visitados]
     resultado = []
     for arista in seleccion:
@@ -63,18 +55,15 @@ def camino(g, inicio, fin, visitados = None):
 def obtenerRutas(nodos):
     arista=[]
     for nodo in nodos[1:]:
-        if arista==[]:
-            arista.append([nodos[0],nodo])
-        else:
-            arista.append([arista[len(arista)-1][1],nodo])
+        if arista==[]: arista.append([nodos[0],nodo])
+        else: arista.append([arista[len(arista)-1][1],nodo])
     return arista
-
-
 
 alto,ancho=1000,700
 fin=False
-azul = 255,255,255
+BLANCO = 255,255,255
 NEGRO=0,0,0
+ROJO=[255,0,0]
 G=nx.Graph()
 nodos=[]
 aristas=[]
@@ -96,17 +85,17 @@ if __name__ == '__main__':
 
     imagen1=pygame.image.load("write.png")
     imagenNodo = pygame.transform.scale(imagen1, [20, 20])
-    pygame.draw.circle(ventana,[255,0,0],(20,20),20)
+    pygame.draw.circle(ventana,ROJO,(20,20),20)
     ventana.blit(imagenNodo, [10, 10])
 
     imagen2=pygame.image.load("arista.png")
     imagenArista = pygame.transform.scale(imagen2, [30,3])
-    pygame.draw.circle(ventana,[255,0,0],(20,60),20)
+    pygame.draw.circle(ventana,ROJO,(20,60),20)
     ventana.blit(imagenArista, [5, 58])
     
     imagen3=pygame.image.load("visitas.png")
     imagenvisitar = pygame.transform.scale(imagen3, [30, 30])
-    pygame.draw.circle(ventana,[255,0,0],(20,100),20)
+    pygame.draw.circle(ventana,ROJO,(20,100),20)
     ventana.blit(imagenvisitar, [5, 80])
 
 
@@ -116,7 +105,6 @@ if __name__ == '__main__':
                 fin=True
 
             if event.type== pygame.MOUSEBUTTONDOWN:
-                print(event.button)
 
                 if event.button==1:
                     #Boton de agregar nodo
@@ -127,14 +115,14 @@ if __name__ == '__main__':
                         visitar=False
                         pygame.draw.circle(ventana,[0,255,0],(20,20),20)
                         ventana.blit(imagenNodo, [10, 10])
-                        pygame.draw.circle(ventana,[255,0,0],(20,60),20)
+                        pygame.draw.circle(ventana,ROJO,(20,60),20)
                         ventana.blit(imagenArista, [5, 58])
-                        pygame.draw.circle(ventana,[255,0,0],(20,100),20)
+                        pygame.draw.circle(ventana,ROJO,(20,100),20)
                         ventana.blit(imagenvisitar, [5, 80])
                         #Desactivacion
                     elif event.pos[0]<40 and event.pos[1]<40 and agregarNodo==True:
                          agregarNodo=False
-                         pygame.draw.circle(ventana,[255,0,0],(20,20),20)
+                         pygame.draw.circle(ventana,ROJO,(20,20),20)
                          ventana.blit(imagenNodo, [10, 10])
 
                     #Boton agregar arista
@@ -144,14 +132,14 @@ if __name__ == '__main__':
                         visitar=False
                         pygame.draw.circle(ventana,[0,255,0],(20,60),20)
                         ventana.blit(imagenArista, [5, 58])
-                        pygame.draw.circle(ventana,[255,0,0],(20,20),20)
+                        pygame.draw.circle(ventana,ROJO,(20,20),20)
                         ventana.blit(imagenNodo, [10, 10])
-                        pygame.draw.circle(ventana,[255,0,0],(20,100),20)
+                        pygame.draw.circle(ventana,ROJO,(20,100),20)
                         ventana.blit(imagenvisitar, [5, 80])
 
                     elif event.pos[0]<40 and event.pos[1]>40 and event.pos[1]<80 and agregarArista==True:
                          agregarArista=False
-                         pygame.draw.circle(ventana,[255,0,0],(20,60),20)
+                         pygame.draw.circle(ventana,ROJO,(20,60),20)
                          ventana.blit(imagenArista, [5, 68])
                     #Boton hacer visitar
 
@@ -159,23 +147,23 @@ if __name__ == '__main__':
                         agregarArista=False
                         agregarNodo=False
                         visitar=True
-                        pygame.draw.circle(ventana,[255,0,0],(20,60),20)
+                        pygame.draw.circle(ventana,ROJO,(20,60),20)
                         ventana.blit(imagenArista, [5, 58])
-                        pygame.draw.circle(ventana,[255,0,0],(20,20),20)
+                        pygame.draw.circle(ventana,ROJO,(20,20),20)
                         ventana.blit(imagenNodo, [10, 10])
                         pygame.draw.circle(ventana,[0,255,0],(20,100),20)
                         ventana.blit(imagenvisitar, [5, 80])
 
                     elif event.pos[0]<40 and event.pos[1]>40 and event.pos[1]<80 and visitar==True:
                          visitar=False
-                         pygame.draw.circle(ventana,[255,0,0],(20,100),20)
+                         pygame.draw.circle(ventana,ROJO,(20,100),20)
                          ventana.blit(imagenvisitar, [5, 80])
                          
 
                     elif (agregarNodo==True):
                         if len(nodos)==0:
                             nodos.append(event.pos)
-                            pygame.draw.circle(ventana,azul,event.pos,20)
+                            pygame.draw.circle(ventana,BLANCO,event.pos,20)
                         else:
                             cont=0
                             for nodo in nodos:
@@ -196,7 +184,7 @@ if __name__ == '__main__':
                                     cont=cont+1
                             if len(nodos)==cont:
                                 nodos.append(event.pos)
-                                pygame.draw.circle(ventana,azul,event.pos,20)
+                                pygame.draw.circle(ventana,BLANCO,event.pos,20)
                                     
                     elif (agregarArista==True):
                         for nodo in nodos:
@@ -218,12 +206,12 @@ if __name__ == '__main__':
                                     aux.append(nodo)
 
                                 if (len(aux)==2):
-                                    pygame.draw.line(ventana,azul,aux[0],aux[1])
+                                    pygame.draw.line(ventana,BLANCO,aux[0],aux[1])
                                     if aux in aristas or [aux[1],aux[0]] in aristas:
                                         continue
                                     else:
                                         aristas.append(aux)
-                                        aristas.append([aux[1],aux[0]])
+                                        #aristas.append([aux[1],aux[0]])
                                     aux=[]
                                 break
                     elif(visitar==True):
@@ -259,7 +247,7 @@ if __name__ == '__main__':
                                         pygame.draw.line(ventana,[250,0,0],arista[0],arista[1])
                                         pygame.display.flip()
                                         pygame.time.delay(500)
-                                        pygame.draw.circle(ventana,[255,0,0],arista[1],20)
+                                        pygame.draw.circle(ventana,ROJO,arista[1],20)
                                         pygame.display.flip()
                                 print(len(NodosInicioFinal))
                                 break
@@ -309,7 +297,7 @@ if __name__ == '__main__':
 
                     for nodo in nodos:
                         nodosConEtiqueta.append(chr(letraInicial))
-                        pygame.draw.circle(ventana,azul,nodo,20)
+                        pygame.draw.circle(ventana,BLANCO,nodo,20)
                         fuente_J=pygame.font.Font(None,32)
                         mjs=chr(letraInicial)
                         info=fuente_J.render(mjs,True,NEGRO)
@@ -323,11 +311,12 @@ if __name__ == '__main__':
                         v2=nodosConEtiqueta[nodos.index(arista[1])]
                         aristaConEtiquetas.append([v1,v2])
                     print(aristaConEtiquetas)
-                    G.add_edges_from(aristaConEtiquetas)
+                    G.add_edges_from(aristaConEtiquetas)  
 
                     print("Estos son los nodos ", G.nodes)
                     print("Estos son las aristas", G.edges)
-
+                    Gmatrix= nx.adjacency_matrix(G)
+                    print(Gmatrix.todense())
 
                 if event.key == pygame.K_v:
                     nodoActual=nodos[0]
@@ -363,13 +352,5 @@ if __name__ == '__main__':
                             pygame.draw.line(ventana,[250,0,0],nodoActual,lpd)
                             nodoActual=lpd
                         pygame.display.flip()
-
-                        
-
-
-
-
-
-
             
             pygame.display.flip()
