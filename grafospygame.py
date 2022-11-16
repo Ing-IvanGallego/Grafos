@@ -1,5 +1,6 @@
 import pygame
 import networkx as nx
+import numpy as np 
 import random
 
 def obtenerPosibleDestinio(nodoActual,aristas):
@@ -59,12 +60,21 @@ def obtenerRutas(nodos):
         else: arista.append([arista[len(arista)-1][1],nodo])
     return arista
 
+def esEuleriano(matrix):
+    euleriana=True
+    for array in matrix:
+        cantidadVertices=np.count_nonzero(array == 1)
+        if (cantidadVertices%2==1):
+            euleriana=False
+            break
+    return euleriana
+
 alto,ancho=1000,700
 fin=False
 BLANCO = 255,255,255
 NEGRO=0,0,0
 ROJO=[255,0,0]
-G=nx.Graph()
+G=nx.DiGraph()
 nodos=[]
 aristas=[]
 aux=[]
@@ -97,6 +107,9 @@ if __name__ == '__main__':
     imagenvisitar = pygame.transform.scale(imagen3, [30, 30])
     pygame.draw.circle(ventana,ROJO,(20,100),20)
     ventana.blit(imagenvisitar, [5, 80])
+
+    imagen4=pygame.image.load("flecha.png")
+    imagenflecha = imagen4
 
 
     while(fin==False):
@@ -180,7 +193,6 @@ if __name__ == '__main__':
                                 Diferencia=(((posicion[0]**2) +(posicion[1]**2)))**0.5
                                 print(Diferencia)
                                 if Diferencia> 80:
-
                                     cont=cont+1
                             if len(nodos)==cont:
                                 nodos.append(event.pos)
@@ -191,13 +203,10 @@ if __name__ == '__main__':
                             posicion=[]
                             posicion.append(event.pos[0]-nodo[0])
                             posicion.append(event.pos[1]-nodo[1])
-
                             if posicion[0]<0:
                                 posicion[0]=posicion[0]*(-1)
                             if posicion[1]<0:
                                 posicion[1]=posicion[1]*(-1)
-                            
-
                             Diferencia=(((posicion[0]**2) +(posicion[1]**2)))**0.5
                             if Diferencia< 20:
                                 if nodo in aux:
@@ -207,8 +216,14 @@ if __name__ == '__main__':
 
                                 if (len(aux)==2):
                                     pygame.draw.line(ventana,BLANCO,aux[0],aux[1])
+                                    if(aux[0][0]<aux[1][0]):
+                                        ventana.blit(imagenflecha, [((aux[0][0]+aux[1][0])/2)+10,(aux[0][1]+aux[1][1])/2])
+                                    else:
+                                        imagenflechaRotada=pygame.transform.rotate(imagen4, 180)
+                                        ventana.blit(imagenflechaRotada, [(aux[0][0]+aux[1][0])/2,(aux[0][1]+aux[1][1])/2])
                                     if aux in aristas or [aux[1],aux[0]] in aristas:
-                                        continue
+                                        aristas.append(aux)
+                                        #continue
                                     else:
                                         aristas.append(aux)
                                         #aristas.append([aux[1],aux[0]])
@@ -239,17 +254,18 @@ if __name__ == '__main__':
                                     nodosDelCamino=camino([nodosConEtiqueta,aristaConEtiquetas],nodosConEtiqueta[nodos.index(NodosInicioFinal[0])],
                                         nodosConEtiqueta[nodos.index(NodosInicioFinal[1])])
                                     NodosInicioFinal=[]
-                                    print(NodosInicioFinal)
-                                    rutas=obtenerRutas(nodosDelCamino)
-                                    for ruta in rutas:
-                                        arista=aristas[aristaConEtiquetas.index(ruta)]
-                                        pygame.time.delay(500)
-                                        pygame.draw.line(ventana,[250,0,0],arista[0],arista[1])
-                                        pygame.display.flip()
-                                        pygame.time.delay(500)
-                                        pygame.draw.circle(ventana,ROJO,arista[1],20)
-                                        pygame.display.flip()
-                                print(len(NodosInicioFinal))
+                                    if nodosDelCamino !=[]:
+                                        rutas=obtenerRutas(nodosDelCamino)
+                                        for ruta in rutas:
+                                            arista=aristas[aristaConEtiquetas.index(ruta)]
+                                            pygame.time.delay(500)
+                                            pygame.draw.line(ventana,[250,0,0],arista[0],arista[1])
+                                            pygame.display.flip()
+                                            pygame.time.delay(500)
+                                            pygame.draw.circle(ventana,ROJO,arista[1],20)
+                                            pygame.display.flip()
+                                    else:
+                                        print("El grafo es no conexo o no se puede llegar por ")
                                 break
 
                         
@@ -264,7 +280,6 @@ if __name__ == '__main__':
                         posicion=[]
                         posicion.append(event.pos[0]-nodo[0])
                         posicion.append(event.pos[1]-nodo[1])
-
                         if posicion[0]<0:
                             posicion[0]=posicion[0]*(-1)
                         if posicion[1]<0:
@@ -289,6 +304,7 @@ if __name__ == '__main__':
                             break
                                     
             if event.type == pygame.KEYDOWN:
+                G=nx.DiGraph()
                 if event.key == pygame.K_a:
                     letraInicial=65
                     nodosConEtiqueta=[]
@@ -304,20 +320,46 @@ if __name__ == '__main__':
                         ventana.blit(info,nodo)
                         letraInicial+=1
                     G.add_nodes_from(nodosConEtiqueta)
-                        
-                    print(nodosConEtiqueta)
                     for arista in aristas:
                         v1=nodosConEtiqueta[nodos.index(arista[0])] 
                         v2=nodosConEtiqueta[nodos.index(arista[1])]
                         aristaConEtiquetas.append([v1,v2])
-                    print(aristaConEtiquetas)
                     G.add_edges_from(aristaConEtiquetas)  
 
                     print("Estos son los nodos ", G.nodes)
                     print("Estos son las aristas", G.edges)
-                    Gmatrix= nx.adjacency_matrix(G)
-                    print(Gmatrix.todense())
-
+                    Gmatrix=nx.adjacency_matrix(G)
+                    
+                    isEulerian=nx.is_eulerian(G)
+                    print("Funcion euleriana networkx",isEulerian)
+                    #print(esEuleriano(Gmatrix.todense()))
+                    if (isEulerian==True):
+                        #source=="A" para empezar en el nodo que decee
+                        destinos=list(nx.eulerian_circuit(G))
+                        """print(destinos)
+                        repeticion=[]
+                        for destino in destinos:
+                            arista=aristas[aristaConEtiquetas.index([destino[0],destino[1]])]
+                            if [destino[0],destino[1]] in repeticion or [destino[1],destino[0]] in repeticion :
+                                pygame.time.delay(500)
+                                pygame.draw.line(ventana,[0,255,0],arista[0],arista[1])
+                                pygame.display.flip()
+                                pygame.time.delay(500)
+                                pygame.draw.circle(ventana,[0,255,0],arista[1],20)
+                                pygame.display.flip()
+                                if ([destino[0],destino[1]] in repeticion):repeticion.remove([destino[0],destino[1]])
+                                else:repeticion.remove([destino[1],destino[0]])
+                            else:
+                                pygame.time.delay(500)
+                                pygame.draw.line(ventana,[250,0,0],arista[0],arista[1])
+                                pygame.display.flip()
+                                pygame.time.delay(500)
+                                pygame.draw.circle(ventana,ROJO,arista[1],20)
+                                pygame.display.flip()
+                            repeticion.append([destino[0],destino[1]])
+                    else:
+                        print("No es eulerian_circuit")
+                """
                 if event.key == pygame.K_v:
                     nodoActual=nodos[0]
                     listaVisitada=[nodoActual]
