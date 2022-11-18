@@ -60,14 +60,62 @@ def obtenerRutas(nodos):
         else: arista.append([arista[len(arista)-1][1],nodo])
     return arista
 
-def esEuleriano(matrix):
+def esEuleriano(nodos, edges):
     euleriana=True
-    for array in matrix:
-        cantidadVertices=np.count_nonzero(array == 1)
-        if (cantidadVertices%2==1):
+    vecinos=[0]*len(nodos)
+    for (nodoinicio,nodoFinal) in edges:
+        vecinos[nodos.index(nodoinicio)]+=1
+        vecinos[nodos.index(nodoFinal)]+=1
+    for vecinoNodo in vecinos:
+        print(vecinos)
+        if (vecinoNodo%2==1):
             euleriana=False
+            return euleriana,nodos[vecinos.index(vecinoNodo)]
             break
     return euleriana
+def printCircuito(edges,nodos):
+    curr_path=[0]
+    circuit=[]
+    circuitoConEtiqueta=[]
+    vecinos=[[] for _ in range(len(nodos))]
+    for (nodoinicio,nodoFinal) in edges:
+        vecinos[nodos.index(nodoinicio)].append(nodos.index(nodoFinal))
+    while(curr_path):
+        curr_v=curr_path[-1]
+        if vecinos[curr_v]:
+            nextv=vecinos[curr_v].pop()
+            curr_path.append(nextv)
+        else:
+            circuit.append(curr_path.pop())
+    for  nodo in circuit:
+        circuitoConEtiqueta.append(nodos[nodo])
+    return circuitoConEtiqueta
+
+def recorrerNodos(nodos,v,visitados,vecinos):
+    visitados[nodos.index(v)]=True
+    for u in vecinos[nodos.index(v)]:
+        if not visitados[nodos.index(u)]:
+            recorrerNodos(nodos,u,visitados,vecinos)
+    
+def isconexo(nodos,edges):
+    visitados=[]
+    for i in range(len(nodos)):
+        visitados.append(False)
+    respuesta=True
+    vecinos=[[] for _ in range(len(nodos))]
+    for (nodoinicio,nodoFinal) in edges:
+        vecinos[nodos.index(nodoinicio)].append(nodoFinal)
+        vecinos[nodos.index(nodoFinal)].append(nodoinicio)
+
+    if ([] in vecinos):
+        return False
+    else:
+        casa=recorrerNodos(nodos,nodos[0],visitados,vecinos)
+        for nodovisitado in visitados:
+            if not nodovisitado:
+                respuesta=False
+        return respuesta
+
 
 alto,ancho=1000,700
 fin=False
@@ -83,16 +131,14 @@ borrar=False
 agregarNodo=False
 agregarArista=False
 visitar=False
-
-
-
+conexo=False
+euleriano=False
 
 
 if __name__ == '__main__':
     pygame.init()
     reloj=pygame.time.Clock()
     ventana=pygame.display.set_mode([alto,ancho])
-
     imagen1=pygame.image.load("write.png")
     imagenNodo = pygame.transform.scale(imagen1, [20, 20])
     pygame.draw.circle(ventana,ROJO,(20,20),20)
@@ -111,6 +157,15 @@ if __name__ == '__main__':
     imagen4=pygame.image.load("flecha.png")
     imagenflecha = imagen4
 
+    
+    iconoConexo="C"
+    fuente_J=pygame.font.Font(None,32)
+    pygame.draw.circle(ventana,ROJO,(20,140),20)
+    info=fuente_J.render(iconoConexo,True,NEGRO)
+    ventana.blit(info,[15,135])
+
+
+
 
     while(fin==False):
     	for event in pygame.event.get():
@@ -126,18 +181,23 @@ if __name__ == '__main__':
                         agregarNodo=True
                         agregarArista=False
                         visitar=False
+                        euleriano=False
+                        conexo=False
                         pygame.draw.circle(ventana,[0,255,0],(20,20),20)
                         ventana.blit(imagenNodo, [10, 10])
                         pygame.draw.circle(ventana,ROJO,(20,60),20)
                         ventana.blit(imagenArista, [5, 58])
                         pygame.draw.circle(ventana,ROJO,(20,100),20)
                         ventana.blit(imagenvisitar, [5, 80])
+                        pygame.draw.circle(ventana,ROJO,(20,140),20)
+                        info=fuente_J.render(iconoConexo,True,NEGRO)
+                        ventana.blit(info,[15,135])
+
                         #Desactivacion
                     elif event.pos[0]<40 and event.pos[1]<40 and agregarNodo==True:
                          agregarNodo=False
                          pygame.draw.circle(ventana,ROJO,(20,20),20)
                          ventana.blit(imagenNodo, [10, 10])
-
                     #Boton agregar arista
                     elif event.pos[0]<40 and event.pos[1]>40 and event.pos[1]<80 and agregarArista==False:
                         agregarArista=True
@@ -149,30 +209,58 @@ if __name__ == '__main__':
                         ventana.blit(imagenNodo, [10, 10])
                         pygame.draw.circle(ventana,ROJO,(20,100),20)
                         ventana.blit(imagenvisitar, [5, 80])
+                        pygame.draw.circle(ventana,ROJO,(20,140),20)
+                        info=fuente_J.render(iconoConexo,True,NEGRO)
+                        ventana.blit(info,[15,135])
 
                     elif event.pos[0]<40 and event.pos[1]>40 and event.pos[1]<80 and agregarArista==True:
                          agregarArista=False
                          pygame.draw.circle(ventana,ROJO,(20,60),20)
                          ventana.blit(imagenArista, [5, 68])
                     #Boton hacer visitar
-
-                    elif event.pos[0]<40 and event.pos[1]>40 and event.pos[1]<120 and visitar==False:
+                    elif event.pos[0]<40 and event.pos[1]>80 and event.pos[1]<120 and visitar==False:
                         agregarArista=False
                         agregarNodo=False
                         visitar=True
+                        conexo=False
+                        euleriano=False
                         pygame.draw.circle(ventana,ROJO,(20,60),20)
                         ventana.blit(imagenArista, [5, 58])
                         pygame.draw.circle(ventana,ROJO,(20,20),20)
                         ventana.blit(imagenNodo, [10, 10])
                         pygame.draw.circle(ventana,[0,255,0],(20,100),20)
                         ventana.blit(imagenvisitar, [5, 80])
-
-                    elif event.pos[0]<40 and event.pos[1]>40 and event.pos[1]<80 and visitar==True:
+                        pygame.draw.circle(ventana,ROJO,(20,140),20)
+                        info=fuente_J.render(iconoConexo,True,NEGRO)
+                        ventana.blit(info,[15,135])
+                    elif event.pos[0]<40 and event.pos[1]>80 and event.pos[1]<120 and visitar==True:
                          visitar=False
                          pygame.draw.circle(ventana,ROJO,(20,100),20)
                          ventana.blit(imagenvisitar, [5, 80])
-                         
 
+                    elif event.pos[0]<40 and event.pos[1]>120 and event.pos[1]<160 and conexo==False:
+                        agregarArista=False
+                        agregarNodo=False
+                        visitar=False
+                        conexo=True
+                        euleriano=False
+                        pygame.draw.circle(ventana,ROJO,(20,60),20)
+                        ventana.blit(imagenArista, [5, 58])
+                        pygame.draw.circle(ventana,ROJO,(20,20),20)
+                        ventana.blit(imagenNodo, [10, 10])
+                        pygame.draw.circle(ventana,ROJO,(20,100),20)
+                        ventana.blit(imagenvisitar, [5, 80])
+                        pygame.draw.circle(ventana,[0,255,0],(20,140),20)
+                        info=fuente_J.render(iconoConexo,True,NEGRO)
+                        ventana.blit(info,[15,135])
+
+                    elif event.pos[0]<40 and event.pos[1]>120 and event.pos[1]<160 and conexo==True:
+                         conexo=False
+                         pygame.draw.circle(ventana,ROJO,(20,140),20)
+                         info=fuente_J.render(iconoConexo,True,NEGRO)
+                         ventana.blit(info,[15,135])
+                    
+                         
                     elif (agregarNodo==True):
                         if len(nodos)==0:
                             nodos.append(event.pos)
@@ -239,8 +327,6 @@ if __name__ == '__main__':
                                 posicion[0]=posicion[0]*(-1)
                             if posicion[1]<0:
                                 posicion[1]=posicion[1]*(-1)
-                            
-
                             Diferencia=(((posicion[0]**2) +(posicion[1]**2)))**0.5
 
                             if Diferencia< 20:
@@ -267,13 +353,37 @@ if __name__ == '__main__':
                                     else:
                                         print("El grafo es no conexo o no se puede llegar por ")
                                 break
+                    elif(conexo==True):
+                        G=nx.Graph()
+                        letraInicial=65
+                        nodosConEtiqueta=[]
+                        aristaConEtiquetas=[]
+                        for nodo in nodos:
+                            nodosConEtiqueta.append(chr(letraInicial))
+                            pygame.draw.circle(ventana,BLANCO,nodo,20)
+                            fuente_J=pygame.font.Font(None,32)
+                            mjs=chr(letraInicial)
+                            info=fuente_J.render(mjs,True,NEGRO)
+                            ventana.blit(info,nodo)
+                            letraInicial+=1
+                        G.add_nodes_from(nodosConEtiqueta)
+                        for arista in aristas:
+                            v1=nodosConEtiqueta[nodos.index(arista[0])] 
+                            v2=nodosConEtiqueta[nodos.index(arista[1])]
+                            aristaConEtiquetas.append([v1,v2])
+                        G.add_edges_from(aristaConEtiquetas)  
 
+                        print("Estos son los nodos ", G.nodes)
+                        print("Estos son las aristas", G.edges)
+                        #Para saber si es conexo
+                        if (len(G.edges)<(len(G.nodes(G))-1)):
+                            print("No es conexo debido a que el minimo de aristas deben ser  de n-1")
+                        elif(isconexo(nodosConEtiqueta,aristaConEtiquetas)==False):
+                            print("no conexo")
+                        else:
+                            print("Es conexo")
                         
 
-                    
-
-
-                        
 
                 if event.button==3:
                     for nodo in nodos:
@@ -291,6 +401,15 @@ if __name__ == '__main__':
                         if Diferencia < 20 and agregarNodo==True:
                             pygame.draw.circle(ventana,NEGRO,nodo,20)
                             nodos.remove(nodo)
+                            for arista in aristas:
+                                print(arista,"nodo--->",nodo)
+                                if arista[0]==nodo or arista[1]==nodo:
+                                    aristas.remove(arista)
+                                    pygame.draw.line(ventana,NEGRO,arista[0],arista[1])
+
+
+
+
                             
                     for arista in aristas:
                         pendiente=(arista[0][0]-arista[1][0])/(arista[0][1]-arista[1][1])
@@ -300,17 +419,16 @@ if __name__ == '__main__':
                         if pendiente2>limiteinferior and pendiente2<limiteSuperior and agregarArista==True:
                             pygame.draw.line(ventana,NEGRO,arista[0],arista[1])
                             aristas.remove(arista)
-                            aristas.remove([arista[1],arista[0]])
+                            #Si es dirigido
+                            #aristas.remove([arista[1],arista[0]])
                             break
                                     
             if event.type == pygame.KEYDOWN:
-                G=nx.DiGraph()
+                G=nx.Graph()
                 if event.key == pygame.K_a:
                     letraInicial=65
                     nodosConEtiqueta=[]
                     aristaConEtiquetas=[]
-
-
                     for nodo in nodos:
                         nodosConEtiqueta.append(chr(letraInicial))
                         pygame.draw.circle(ventana,BLANCO,nodo,20)
@@ -328,15 +446,26 @@ if __name__ == '__main__':
 
                     print("Estos son los nodos ", G.nodes)
                     print("Estos son las aristas", G.edges)
-                    Gmatrix=nx.adjacency_matrix(G)
+                    #Gmatrix=nx.adjacency_matrix(G)
+                    """#Para saber si es conexo
+                    if (len(G.edges)<(len(G.nodes(G))-1)):
+                        print("No es conexo debido a que el minimo de aristas deben ser  de n-1")
+                    elif(isconexo(nodosConEtiqueta,aristaConEtiquetas)==False):
+                        print("no conexo")
+                    else:
+                        print("Es conexo")
+                    """
+   
                     
-                    isEulerian=nx.is_eulerian(G)
-                    print("Funcion euleriana networkx",isEulerian)
+                    isEulerian=esEuleriano(nodosConEtiqueta,aristaConEtiquetas)
+                    print("Funcion euleriana ",isEulerian)
+                    if isEulerian==True:
+                        destinos=printCircuito(aristaConEtiquetas,nodosConEtiqueta)
                     #print(esEuleriano(Gmatrix.todense()))
-                    if (isEulerian==True):
+                    """if (isEulerian==True):
                         #source=="A" para empezar en el nodo que decee
                         destinos=list(nx.eulerian_circuit(G))
-                        """print(destinos)
+                        print(destinos)
                         repeticion=[]
                         for destino in destinos:
                             arista=aristas[aristaConEtiquetas.index([destino[0],destino[1]])]
@@ -358,8 +487,7 @@ if __name__ == '__main__':
                                 pygame.display.flip()
                             repeticion.append([destino[0],destino[1]])
                     else:
-                        print("No es eulerian_circuit")
-                """
+                        print("No es eulerian_circuit")"""
                 if event.key == pygame.K_v:
                     nodoActual=nodos[0]
                     listaVisitada=[nodoActual]
