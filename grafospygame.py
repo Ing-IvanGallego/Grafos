@@ -116,6 +116,47 @@ def isconexo(nodos,edges):
                 respuesta=False
         return respuesta
 
+def asignacionGrupo(nodos,vecinos,visitados,cualGrupo,grupos):
+     while all(visitados)==False:
+         for u in grupos[cualGrupo]:
+             if visitados[nodos.index(u)]==False:
+                 visitados[nodos.index(u)] = True
+                 if cualGrupo==1: grupo=0
+                 else: grupo=1
+                 for nodo in vecinos[nodos.index(u)]:
+                     if not nodo in grupos[grupo]:
+                         print(grupos)
+                         grupos[grupo].append(nodo)
+                     else: continue
+             else:
+                 continue
+         cualGrupo=grupo
+         asignacionGrupo(nodos,vecinos,visitados,cualGrupo,grupos)
+
+def isBiopartido(nodos,edges):
+     respuesta=True
+     grupo=[False]*len(nodos)
+     visitados=[False]*len(nodos)
+     vecinos=[[] for _ in range(len(nodos))]
+     for (nodoinicio,nodoFinal) in edges:
+        vecinos[nodos.index(nodoinicio)].append(nodoFinal)
+        vecinos[nodos.index(nodoFinal)].append(nodoinicio)
+     visitados[0]=True
+     grupos=[[],[]]
+     grupos[0].append(nodos[0])
+     for nodogrupo1 in vecinos[0]:
+        grupos[1].append(nodogrupo1)
+     asignacionGrupo(nodos,vecinos,visitados,1,grupos)
+     if set(grupos[0]) & set(grupos[1]):
+        return False
+     else:
+        return True
+
+     return grupos
+
+     return asignacionGrupo(nodos,vecinos,visitados,1,grupos)
+
+
 
 alto,ancho=1000,700
 fin=False
@@ -335,6 +376,7 @@ if __name__ == '__main__':
                                     NodosInicioFinal.append(nodo)
 
                                 if(len(NodosInicioFinal)==1 and NodosInicioFinal[0] != nodo):
+                                    
                                     pygame.draw.circle(ventana,[0,0,255],nodo,20)
                                     NodosInicioFinal.append(nodo)
                                     nodosDelCamino=camino([nodosConEtiqueta,aristaConEtiquetas],nodosConEtiqueta[nodos.index(NodosInicioFinal[0])],
@@ -350,8 +392,6 @@ if __name__ == '__main__':
                                             pygame.time.delay(500)
                                             pygame.draw.circle(ventana,ROJO,arista[1],20)
                                             pygame.display.flip()
-                                    else:
-                                        print("El grafo es no conexo o no se puede llegar por ")
                                 break
                     elif(conexo==True):
                         G=nx.Graph()
@@ -446,23 +486,19 @@ if __name__ == '__main__':
 
                     print("Estos son los nodos ", G.nodes)
                     print("Estos son las aristas", G.edges)
-                    #Gmatrix=nx.adjacency_matrix(G)
-                    """#Para saber si es conexo
-                    if (len(G.edges)<(len(G.nodes(G))-1)):
-                        print("No es conexo debido a que el minimo de aristas deben ser  de n-1")
-                    elif(isconexo(nodosConEtiqueta,aristaConEtiquetas)==False):
-                        print("no conexo")
-                    else:
-                        print("Es conexo")
-                    """
-   
                     
+                    if (isconexo(nodosConEtiqueta,aristaConEtiquetas)==True):
+                        print( "Es bipartido ",isBiopartido(nodosConEtiqueta,aristaConEtiquetas))
+                    else:
+                        print("No es bipartido")
+   
+                    """
                     isEulerian=esEuleriano(nodosConEtiqueta,aristaConEtiquetas)
                     print("Funcion euleriana ",isEulerian)
                     if isEulerian==True:
                         destinos=printCircuito(aristaConEtiquetas,nodosConEtiqueta)
                     #print(esEuleriano(Gmatrix.todense()))
-                    """if (isEulerian==True):
+                    if (isEulerian==True):
                         #source=="A" para empezar en el nodo que decee
                         destinos=list(nx.eulerian_circuit(G))
                         print(destinos)
