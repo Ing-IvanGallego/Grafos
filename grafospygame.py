@@ -197,6 +197,7 @@ if __name__ == '__main__':
                                     # Digraph
                                     digraph = True
                                     stop = False
+                                    mjs="DIGRAPH"
                                     fin=True
 
                     elif (position[0] > 694 and position[0] < 858 and
@@ -204,9 +205,14 @@ if __name__ == '__main__':
                                     #Undirected
                                     digraph = False
                                     stop = False
+                                    mjs="UNDIRECTED"
                                     fin=True
         pygame.display.update()
+    
     pygame.draw.rect(ventana, NEGRO, (0,0,ancho,alto))
+    fuente_texto=pygame.font.Font(None,25)
+    info=fuente_texto.render(mjs,True,BLANCO)
+    ventana.blit(info,[45,10])
     imagen1=pygame.image.load("write.png")
     imagenNodo = pygame.transform.scale(imagen1, [20, 20])
     pygame.draw.circle(ventana,ROJO,(20,20),20)
@@ -379,7 +385,7 @@ if __name__ == '__main__':
                     
  ####################################################################################      
                     #Logica de los botones                        
-                    elif (agregarNodo==True):
+                    elif (agregarNodo==True and event.pos[1] >60):
                         if len(nodos)==0:
                             nodos.append(event.pos)
                             pygame.draw.circle(ventana,BLANCO,event.pos,20)
