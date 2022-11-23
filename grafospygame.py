@@ -125,13 +125,11 @@ def asignacionGrupo(nodos,vecinos,visitados,cualGrupo,grupos):
                  else: grupo=1
                  for nodo in vecinos[nodos.index(u)]:
                      if not nodo in grupos[grupo]:
-                         print(grupos)
                          grupos[grupo].append(nodo)
                      else: continue
              else:
                  continue
          cualGrupo=grupo
-         asignacionGrupo(nodos,vecinos,visitados,cualGrupo,grupos)
 
 def isBiopartido(nodos,edges):
      respuesta=True
@@ -152,13 +150,7 @@ def isBiopartido(nodos,edges):
      else:
         return True
 
-     return grupos
-
-     return asignacionGrupo(nodos,vecinos,visitados,1,grupos)
-
-
-
-alto,ancho=1000,700
+alto,ancho=700,1200
 fin=False
 BLANCO = 255,255,255
 NEGRO=0,0,0
@@ -174,12 +166,47 @@ agregarArista=False
 visitar=False
 conexo=False
 euleriano=False
-
+bipartito=False
+stop = True
+digraph=False
+imgMenu = pygame.image.load('graphMenu.png')
 
 if __name__ == '__main__':
     pygame.init()
     reloj=pygame.time.Clock()
-    ventana=pygame.display.set_mode([alto,ancho])
+    ventana=pygame.display.set_mode([ancho,alto])
+#Menu to select digraphs and undirected graphs
+    while stop:
+        accion=pygame.mouse.get_pos()
+        if (accion[0] > 350 and accion[0] < 503 and accion[1] > 467 and accion[1] < 529):
+            pygame.draw.rect(ventana,ROJO,(328,450,160,80),2,50)
+                         
+        if (accion[0] > 694 and accion[0] < 858 and accion[1] > 467 and accion[1] < 529):
+            pygame.draw.rect(ventana,ROJO,(670,450,210,80),2,50)      
+                                   
+        for event in pygame.event.get():
+            ventana.blit(imgMenu, (200,0)) 
+            if event.type == pygame.QUIT:
+                stop=False
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                position = pygame.mouse.get_pos() #Gets the mouse position
+                if event.button == 1:
+                    if (position[0] > 350 and position[0] < 503 and
+                                    position[1] > 467 and position[1] < 529):
+                                    # Digraph
+                                    digraph = True
+                                    stop = False
+                                    fin=True
+
+                    elif (position[0] > 694 and position[0] < 858 and
+                                    position[1] > 467 and position[1] < 529):
+                                    #Undirected
+                                    digraph = False
+                                    stop = False
+                                    fin=True
+        pygame.display.update()
+    pygame.draw.rect(ventana, NEGRO, (0,0,ancho,alto))
     imagen1=pygame.image.load("write.png")
     imagenNodo = pygame.transform.scale(imagen1, [20, 20])
     pygame.draw.circle(ventana,ROJO,(20,20),20)
@@ -198,20 +225,24 @@ if __name__ == '__main__':
     imagen4=pygame.image.load("flecha.png")
     imagenflecha = imagen4
 
-    
+    imagen6=pygame.image.load("flechaBorrar.png")
+    imagenflechaBorrar = imagen6
     iconoConexo="C"
+
     fuente_J=pygame.font.Font(None,32)
     pygame.draw.circle(ventana,ROJO,(20,140),20)
     info=fuente_J.render(iconoConexo,True,NEGRO)
     ventana.blit(info,[15,135])
 
-
-
-
-    while(fin==False):
+    imagen5=pygame.image.load("b.png")
+    imagenbipartido= pygame.transform.scale(imagen5, [30, 30])
+    pygame.draw.circle(ventana,ROJO,(20,180),20)
+    ventana.blit(imagenbipartido, [5, 170])
+    print(digraph)
+    while(fin==True):
     	for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                fin=True
+                fin=False
 
             if event.type== pygame.MOUSEBUTTONDOWN:
 
@@ -224,6 +255,7 @@ if __name__ == '__main__':
                         visitar=False
                         euleriano=False
                         conexo=False
+                        bipartito=False
                         pygame.draw.circle(ventana,[0,255,0],(20,20),20)
                         ventana.blit(imagenNodo, [10, 10])
                         pygame.draw.circle(ventana,ROJO,(20,60),20)
@@ -233,17 +265,23 @@ if __name__ == '__main__':
                         pygame.draw.circle(ventana,ROJO,(20,140),20)
                         info=fuente_J.render(iconoConexo,True,NEGRO)
                         ventana.blit(info,[15,135])
+                        pygame.draw.circle(ventana,ROJO,(20,180),20)
+                        ventana.blit(imagenbipartido, [5, 170])
 
                         #Desactivacion
                     elif event.pos[0]<40 and event.pos[1]<40 and agregarNodo==True:
                          agregarNodo=False
                          pygame.draw.circle(ventana,ROJO,(20,20),20)
                          ventana.blit(imagenNodo, [10, 10])
+
                     #Boton agregar arista
                     elif event.pos[0]<40 and event.pos[1]>40 and event.pos[1]<80 and agregarArista==False:
                         agregarArista=True
                         agregarNodo=False
                         visitar=False
+                        bipartito=False
+                        conexo=False
+                        euleriano=False
                         pygame.draw.circle(ventana,[0,255,0],(20,60),20)
                         ventana.blit(imagenArista, [5, 58])
                         pygame.draw.circle(ventana,ROJO,(20,20),20)
@@ -253,6 +291,8 @@ if __name__ == '__main__':
                         pygame.draw.circle(ventana,ROJO,(20,140),20)
                         info=fuente_J.render(iconoConexo,True,NEGRO)
                         ventana.blit(info,[15,135])
+                        pygame.draw.circle(ventana,ROJO,(20,180),20)
+                        ventana.blit(imagenbipartido, [5, 170])
 
                     elif event.pos[0]<40 and event.pos[1]>40 and event.pos[1]<80 and agregarArista==True:
                          agregarArista=False
@@ -265,6 +305,7 @@ if __name__ == '__main__':
                         visitar=True
                         conexo=False
                         euleriano=False
+                        bipartito=False
                         pygame.draw.circle(ventana,ROJO,(20,60),20)
                         ventana.blit(imagenArista, [5, 58])
                         pygame.draw.circle(ventana,ROJO,(20,20),20)
@@ -274,17 +315,24 @@ if __name__ == '__main__':
                         pygame.draw.circle(ventana,ROJO,(20,140),20)
                         info=fuente_J.render(iconoConexo,True,NEGRO)
                         ventana.blit(info,[15,135])
+                        pygame.draw.circle(ventana,ROJO,(20,180),20)
+                        ventana.blit(imagenbipartido, [5, 170])
+
                     elif event.pos[0]<40 and event.pos[1]>80 and event.pos[1]<120 and visitar==True:
                          visitar=False
                          pygame.draw.circle(ventana,ROJO,(20,100),20)
                          ventana.blit(imagenvisitar, [5, 80])
 
+                    #Boton saber si es conexo
                     elif event.pos[0]<40 and event.pos[1]>120 and event.pos[1]<160 and conexo==False:
                         agregarArista=False
                         agregarNodo=False
                         visitar=False
                         conexo=True
                         euleriano=False
+                        bipartito=False
+                        pygame.draw.rect(ventana, BLANCO, [200,2,800,40],5,10)
+                        pygame.draw.rect(ventana, NEGRO, [400,8,500,25])
                         pygame.draw.circle(ventana,ROJO,(20,60),20)
                         ventana.blit(imagenArista, [5, 58])
                         pygame.draw.circle(ventana,ROJO,(20,20),20)
@@ -294,14 +342,43 @@ if __name__ == '__main__':
                         pygame.draw.circle(ventana,[0,255,0],(20,140),20)
                         info=fuente_J.render(iconoConexo,True,NEGRO)
                         ventana.blit(info,[15,135])
+                        pygame.draw.circle(ventana,ROJO,(20,180),20)
+                        ventana.blit(imagenbipartido, [5, 170])
 
                     elif event.pos[0]<40 and event.pos[1]>120 and event.pos[1]<160 and conexo==True:
                          conexo=False
                          pygame.draw.circle(ventana,ROJO,(20,140),20)
                          info=fuente_J.render(iconoConexo,True,NEGRO)
                          ventana.blit(info,[15,135])
+                    #Boton saber si es bipartito
+                    elif event.pos[0]<40 and event.pos[1]>160 and event.pos[1]<200 and bipartito==False:
+                        agregarArista=False
+                        agregarNodo=False
+                        visitar=False
+                        conexo=False
+                        euleriano=False
+                        bipartito=True
+                        pygame.draw.rect(ventana, BLANCO, [200,2,800,40],5,10)
+                        pygame.draw.rect(ventana, NEGRO, [400,8,500,25])
+                        pygame.draw.circle(ventana,ROJO,(20,60),20)
+                        ventana.blit(imagenArista, [5, 58])
+                        pygame.draw.circle(ventana,ROJO,(20,20),20)
+                        ventana.blit(imagenNodo, [10, 10])
+                        pygame.draw.circle(ventana,ROJO,(20,100),20)
+                        ventana.blit(imagenvisitar, [5, 80])
+                        pygame.draw.circle(ventana,ROJO,(20,140),20)
+                        info=fuente_J.render(iconoConexo,True,NEGRO)
+                        ventana.blit(info,[15,135])
+                        pygame.draw.circle(ventana,[0,255,0],(20,180),20)
+                        ventana.blit(imagenbipartido, [5, 170])
+
+                    elif event.pos[0]<40 and event.pos[1]>160 and event.pos[1]<200 and bipartito==True:
+                        bipartito=False
+                        pygame.draw.circle(ventana,[0,255,0],(20,180),20)
+                        ventana.blit(imagenbipartido, [5, 170])
                     
-                         
+ ####################################################################################      
+                    #Logica de los botones                        
                     elif (agregarNodo==True):
                         if len(nodos)==0:
                             nodos.append(event.pos)
@@ -313,14 +390,11 @@ if __name__ == '__main__':
                                 posicion=[]
                                 posicion.append(event.pos[0]-nodo[0])
                                 posicion.append(event.pos[1]-nodo[1])
-
                                 if posicion[0]<0:
                                     posicion[0]=posicion[0]*(-1)
                                 if posicion[1]<0:
                                     posicion[1]=posicion[1]*(-1)
-
                                 Diferencia=(((posicion[0]**2) +(posicion[1]**2)))**0.5
-                                print(Diferencia)
                                 if Diferencia> 80:
                                     cont=cont+1
                             if len(nodos)==cont:
@@ -342,23 +416,41 @@ if __name__ == '__main__':
                                     break
                                 else:
                                     aux.append(nodo)
-
                                 if (len(aux)==2):
                                     pygame.draw.line(ventana,BLANCO,aux[0],aux[1])
-                                    if(aux[0][0]<aux[1][0]):
-                                        ventana.blit(imagenflecha, [((aux[0][0]+aux[1][0])/2)+10,(aux[0][1]+aux[1][1])/2])
+                                    if digraph==True:
+                                        if(aux[0][0]<aux[1][0]):
+                                            ventana.blit(imagenflecha, [((aux[0][0]+aux[1][0])/2)+10,(aux[0][1]+aux[1][1])/2])
+                                        else:
+                                            imagenflechaRotada=pygame.transform.rotate(imagen4, 180)
+                                            ventana.blit(imagenflechaRotada, [(aux[0][0]+aux[1][0])/2,(aux[0][1]+aux[1][1])/2])
+                                    if aux in aristas:
+                                        continue
                                     else:
-                                        imagenflechaRotada=pygame.transform.rotate(imagen4, 180)
-                                        ventana.blit(imagenflechaRotada, [(aux[0][0]+aux[1][0])/2,(aux[0][1]+aux[1][1])/2])
-                                    if aux in aristas or [aux[1],aux[0]] in aristas:
                                         aristas.append(aux)
-                                        #continue
-                                    else:
-                                        aristas.append(aux)
-                                        #aristas.append([aux[1],aux[0]])
+                                    if digraph==False:
+                                        aristas.append([aux[1],aux[0]])
                                     aux=[]
                                 break
+
                     elif(visitar==True):
+                        
+                        letraInicial=65
+                        nodosConEtiqueta=[]
+                        aristaConEtiquetas=[]
+                        for nodo in nodos:
+                            nodosConEtiqueta.append(chr(letraInicial))
+                            pygame.draw.circle(ventana,BLANCO,nodo,20)
+                            fuente_J=pygame.font.Font(None,32)
+                            mjs=chr(letraInicial)
+                            info=fuente_J.render(mjs,True,NEGRO)
+                            ventana.blit(info,nodo)
+                            letraInicial+=1
+                        for arista in aristas:
+                            v1=nodosConEtiqueta[nodos.index(arista[0])] 
+                            v2=nodosConEtiqueta[nodos.index(arista[1])]
+                            aristaConEtiquetas.append([v1,v2])  
+
                         for nodo in nodos:
                             posicion=[]
                             posicion.append(event.pos[0]-nodo[0])
@@ -369,14 +461,11 @@ if __name__ == '__main__':
                             if posicion[1]<0:
                                 posicion[1]=posicion[1]*(-1)
                             Diferencia=(((posicion[0]**2) +(posicion[1]**2)))**0.5
-
                             if Diferencia< 20:
                                 if(len(NodosInicioFinal)==0):
                                     pygame.draw.circle(ventana,[0,255,0],nodo,20)
                                     NodosInicioFinal.append(nodo)
-
                                 if(len(NodosInicioFinal)==1 and NodosInicioFinal[0] != nodo):
-                                    
                                     pygame.draw.circle(ventana,[0,0,255],nodo,20)
                                     NodosInicioFinal.append(nodo)
                                     nodosDelCamino=camino([nodosConEtiqueta,aristaConEtiquetas],nodosConEtiqueta[nodos.index(NodosInicioFinal[0])],
@@ -394,7 +483,6 @@ if __name__ == '__main__':
                                             pygame.display.flip()
                                 break
                     elif(conexo==True):
-                        G=nx.Graph()
                         letraInicial=65
                         nodosConEtiqueta=[]
                         aristaConEtiquetas=[]
@@ -406,24 +494,62 @@ if __name__ == '__main__':
                             info=fuente_J.render(mjs,True,NEGRO)
                             ventana.blit(info,nodo)
                             letraInicial+=1
-                        G.add_nodes_from(nodosConEtiqueta)
+                        for arista in aristas:
+                            v1=nodosConEtiqueta[nodos.index(arista[0])] 
+                            v2=nodosConEtiqueta[nodos.index(arista[1])]
+                            aristaConEtiquetas.append([v1,v2]) 
+
+                        #Para saber si es conexo
+                        if(len(nodosConEtiqueta)==0):
+                            mjs="El grafo no tiene nodos"
+                            ubicacionTexto=[500,8]
+
+                        elif (len(aristaConEtiquetas)<(len(nodosConEtiqueta)-1)):
+                            mjs="No es conexo, numero de aristas menores a los nodos- 1"
+                            ubicacionTexto=[400,8]
+
+                        elif(isconexo(nodosConEtiqueta,aristaConEtiquetas)==True):
+                            mjs="El grafo es conexo"
+                            ubicacionTexto=[500,8]
+                        else:
+                            mjs="El grafo es no conexo"
+                            ubicacionTexto=[500,8]
+                        pygame.draw.rect(ventana, NEGRO, [400,8,500,25])
+                        fuente_texto=pygame.font.Font(None,25)
+                        info=fuente_texto.render(mjs,True,BLANCO)
+                        ventana.blit(info,ubicacionTexto)
+                        pygame.display.flip()
+                    
+                    elif(bipartito==True):
+                        letraInicial=65
+                        nodosConEtiqueta=[]
+                        aristaConEtiquetas=[]
+                        for nodo in nodos:
+                            nodosConEtiqueta.append(chr(letraInicial))
+                            pygame.draw.circle(ventana,BLANCO,nodo,20)
+                            fuente_J=pygame.font.Font(None,32)
+                            mjs=chr(letraInicial)
+                            info=fuente_J.render(mjs,True,NEGRO)
+                            ventana.blit(info,nodo)
+                            letraInicial+=1
                         for arista in aristas:
                             v1=nodosConEtiqueta[nodos.index(arista[0])] 
                             v2=nodosConEtiqueta[nodos.index(arista[1])]
                             aristaConEtiquetas.append([v1,v2])
-                        G.add_edges_from(aristaConEtiquetas)  
-
-                        print("Estos son los nodos ", G.nodes)
-                        print("Estos son las aristas", G.edges)
-                        #Para saber si es conexo
-                        if (len(G.edges)<(len(G.nodes(G))-1)):
-                            print("No es conexo debido a que el minimo de aristas deben ser  de n-1")
-                        elif(isconexo(nodosConEtiqueta,aristaConEtiquetas)==False):
-                            print("no conexo")
+                        if (len(nodosConEtiqueta)==0):
+                            mjs="El Grafo no tiene nodos"
+                        elif (isconexo(nodosConEtiqueta,aristaConEtiquetas)==True):
+                            if(isBiopartido(nodosConEtiqueta,aristaConEtiquetas)==True):
+                                mjs="El grafo es bipartito"
+                            else:
+                                mjs="El grafo no es bipartito"
                         else:
-                            print("Es conexo")
-                        
-
+                            mjs="El grafo no es bipartito"
+                        pygame.draw.rect(ventana, NEGRO, [400,8,500,25])
+                        fuente_texto=pygame.font.Font(None,25)
+                        info=fuente_texto.render(mjs,True,BLANCO)
+                        ventana.blit(info,[500,8])
+                        pygame.display.flip() 
 
                 if event.button==3:
                     for nodo in nodos:
@@ -435,33 +561,40 @@ if __name__ == '__main__':
                         if posicion[1]<0:
                             posicion[1]=posicion[1]*(-1)
                         
-
                         Diferencia=(((posicion[0]**2) +(posicion[1]**2)))**0.5
                         # Eliminar nodo
                         if Diferencia < 20 and agregarNodo==True:
                             pygame.draw.circle(ventana,NEGRO,nodo,20)
                             nodos.remove(nodo)
-                            for arista in aristas:
-                                print(arista,"nodo--->",nodo)
-                                if arista[0]==nodo or arista[1]==nodo:
+                            """for arista in aristas:
+                                if arista[0] is nodo or arista[1] is nodo:
+                                    print("Somos iguales")
+                                if nodo in arista:
+
                                     aristas.remove(arista)
                                     pygame.draw.line(ventana,NEGRO,arista[0],arista[1])
+                                    ventana.blit(imagenflechaBorrar, [((arista[0][0]+arista[1][0])/2)+10,(arista[0][1]+arista[1][1])/2])
+                                    imagenflechaRotada=pygame.transform.rotate(imagen6, 180)
+                                    ventana.blit(imagenflechaRotada, [(arista[0][0]+arista[1][0])/2,(arista[0][1]+arista[1][1])/2])
+                        break"""
+                    if(agregarArista==True):                          
+                        for arista in aristas:
+                            pendiente=(arista[0][0]-arista[1][0])/(arista[0][1]-arista[1][1])
+                            limiteinferior=pendiente-0.2
+                            limiteSuperior=pendiente+0.2
+                            pendiente2=(arista[0][0]-event.pos[0]+0.1)/(arista[0][1]-event.pos[1]+0.1)
 
-
-
-
-                            
-                    for arista in aristas:
-                        pendiente=(arista[0][0]-arista[1][0])/(arista[0][1]-arista[1][1])
-                        limiteinferior=pendiente-0.2
-                        limiteSuperior=pendiente+0.2
-                        pendiente2=(arista[0][0]-event.pos[0]+0.1)/(arista[0][1]-event.pos[1]+0.1)
-                        if pendiente2>limiteinferior and pendiente2<limiteSuperior and agregarArista==True:
-                            pygame.draw.line(ventana,NEGRO,arista[0],arista[1])
-                            aristas.remove(arista)
-                            #Si es dirigido
-                            #aristas.remove([arista[1],arista[0]])
-                            break
+                            if pendiente2>limiteinferior and pendiente2<limiteSuperior and agregarArista==True:
+                                pygame.draw.line(ventana,NEGRO,arista[0],arista[1])
+                                aristas.remove(arista)
+                                if([arista[1],arista[0]] in aristas):
+                                    aristas.remove([arista[1],arista[0]])
+                                ventana.blit(imagenflechaBorrar, [((arista[0][0]+arista[1][0])/2)+10,(arista[0][1]+arista[1][1])/2])
+                                imagenflechaRotada=pygame.transform.rotate(imagen6, 180)
+                                ventana.blit(imagenflechaRotada, [(arista[0][0]+arista[1][0])/2,(arista[0][1]+arista[1][1])/2])
+                                #Si es dirigido
+                                #aristas.remove([arista[1],arista[0]])
+                                break
                                     
             if event.type == pygame.KEYDOWN:
                 G=nx.Graph()
