@@ -169,6 +169,27 @@ def isBiopartido(nodos,edges):
         return False
      else:
         return True
+def colorearMapa(nodos,edges):
+    colorNodos=[""]*len(nodos)
+    vecinos=[[] for _ in range(len(nodos))]
+
+    for (nodoinicio,nodoFinal) in edges:
+        vecinos[nodos.index(nodoinicio)].append(nodoFinal)
+        if digraph==True:
+            if nodoinicio in vecinos[nodos.index(nodoFinal)]:
+                continue
+            else:
+                vecinos[nodos.index(nodoFinal)].append(nodoinicio)
+    
+    for indexNodo in range(len(nodos)):
+        verificarColores=[AMARILLO,VERDE,ROJO,AZUL,[0,255,255]]
+        for vecino in vecinos[indexNodo]:
+            if colorNodos[nodos.index(vecino)] in verificarColores:
+                verificarColores.remove(colorNodos[nodos.index(vecino)])
+
+        colorNodos[indexNodo]=verificarColores[0]
+        
+    return colorNodos
 
 alto,ancho=700,1200
 fin=False
@@ -177,6 +198,7 @@ NEGRO=0,0,0
 ROJO=[255,0,0]
 AZUL=[0,0,255]
 VERDE=[0,255,0]
+AMARILLO=[255,255,0]
 G=nx.DiGraph()
 nodos=[]
 aristas=[]
@@ -189,6 +211,7 @@ visitar=False
 conexo=False
 euleriano=False
 bipartito=False
+colorearGrafo=False
 mostrar_menu = True
 
 digraph=False
@@ -296,6 +319,7 @@ if __name__ == '__main__':
                         euleriano=False
                         conexo=False
                         bipartito=False
+                        colorearGrafo=False
                         pygame.draw.circle(ventana,VERDE,(20,20),20)
                         ventana.blit(imagenNodo, [10, 10])
                         pygame.draw.circle(ventana,ROJO,(20,60),20)
@@ -325,6 +349,7 @@ if __name__ == '__main__':
                         bipartito=False
                         conexo=False
                         euleriano=False
+                        colorearGrafo=False
                         pygame.draw.circle(ventana,VERDE,(20,60),20)
                         ventana.blit(imagenArista, [5, 58])
                         pygame.draw.circle(ventana,ROJO,(20,20),20)
@@ -352,6 +377,7 @@ if __name__ == '__main__':
                         conexo=False
                         euleriano=False
                         bipartito=False
+                        colorearGrafo=False
                         pygame.draw.circle(ventana,ROJO,(20,60),20)
                         ventana.blit(imagenArista, [5, 58])
                         pygame.draw.circle(ventana,ROJO,(20,20),20)
@@ -380,6 +406,7 @@ if __name__ == '__main__':
                         conexo=True
                         euleriano=False
                         bipartito=False
+                        colorearGrafo=False
                         pygame.draw.rect(ventana, NEGRO, [200,6,800,30])
                         mjs="¿Tu grafo sera conexo?"
                         fuente_texto=pygame.font.Font(None,25)
@@ -414,6 +441,7 @@ if __name__ == '__main__':
                         conexo=False
                         euleriano=False
                         bipartito=True
+                        colorearGrafo=False
                         pygame.draw.rect(ventana, NEGRO, [200,6,800,30])
                         mjs="¿Tu grafo sera bipartito?"
                         fuente_texto=pygame.font.Font(None,25)
@@ -445,6 +473,7 @@ if __name__ == '__main__':
                         conexo=False
                         euleriano=True
                         bipartito=False
+                        colorearGrafo=False
                         pygame.draw.rect(ventana, NEGRO, [200,6,700,30])
                         mjs="¿Tu grafo sera Euleriano?"
                         fuente_texto=pygame.font.Font(None,25)
@@ -744,48 +773,16 @@ if __name__ == '__main__':
                         v1=nodosConEtiqueta[nodos.index(arista[0])] 
                         v2=nodosConEtiqueta[nodos.index(arista[1])]
                         aristaConEtiquetas.append([v1,v2])
-                    G.add_edges_from(aristaConEtiquetas)  
-
-                    print("Estos son los nodos ", G.nodes)
-                    print("Estos son las aristas", G.edges)
+                    G.add_edges_from(aristaConEtiquetas)
+                    nodosColoreados=colorearMapa(nodosConEtiqueta,aristaConEtiquetas)
+                    for indexNodo in range(len(nodos)):
+                        pygame.draw.circle(ventana,
+                            nodosColoreados[indexNodo],
+                            nodos[indexNodo],
+                            20)  
+                    print(colorearMapa(nodosConEtiqueta,aristaConEtiquetas))
                     
-                    if (isconexo(nodosConEtiqueta,aristaConEtiquetas)==True):
-                        print( "Es bipartido ",isBiopartido(nodosConEtiqueta,aristaConEtiquetas))
-                    else:
-                        print("No es bipartido")
-   
-                    """
-                    isEulerian=esEuleriano(nodosConEtiqueta,aristaConEtiquetas)
-                    print("Funcion euleriana ",isEulerian)
-                    if isEulerian==True:
-                        destinos=printCircuito(aristaConEtiquetas,nodosConEtiqueta)
-                    #print(esEuleriano(Gmatrix.todense()))
-                    if (isEulerian==True):
-                        #source=="A" para empezar en el nodo que decee
-                        destinos=list(nx.eulerian_circuit(G))
-                        print(destinos)
-                        repeticion=[]
-                        for destino in destinos:
-                            arista=aristas[aristaConEtiquetas.index([destino[0],destino[1]])]
-                            if [destino[0],destino[1]] in repeticion or [destino[1],destino[0]] in repeticion :
-                                pygame.time.delay(500)
-                                pygame.draw.line(ventana,VERDE,arista[0],arista[1])
-                                pygame.display.flip()
-                                pygame.time.delay(500)
-                                pygame.draw.circle(ventana,VERDE,arista[1],20)
-                                pygame.display.flip()
-                                if ([destino[0],destino[1]] in repeticion):repeticion.remove([destino[0],destino[1]])
-                                else:repeticion.remove([destino[1],destino[0]])
-                            else:
-                                pygame.time.delay(500)
-                                pygame.draw.line(ventana,[250,0,0],arista[0],arista[1])
-                                pygame.display.flip()
-                                pygame.time.delay(500)
-                                pygame.draw.circle(ventana,ROJO,arista[1],20)
-                                pygame.display.flip()
-                            repeticion.append([destino[0],destino[1]])
-                    else:
-                        print("No es eulerian_circuit")"""
+                    
                 if event.key == pygame.K_v:
                     nodoActual=nodos[0]
                     listaVisitada=[nodoActual]
