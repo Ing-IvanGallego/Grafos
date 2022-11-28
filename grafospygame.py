@@ -301,6 +301,11 @@ if __name__ == '__main__':
     imgMouseDerecho= pygame.transform.scale(imagen_Mouse, [30, 30])
     imgMouseIzquierda = pygame.transform.flip(imgMouseDerecho, True, False)
 
+    imagenPintar=pygame.image.load("iconoPintar.png")
+    imagenPintar= pygame.transform.scale(imagenPintar, [30, 30])
+    pygame.draw.circle(ventana,ROJO,(20,260),20)
+    ventana.blit(imagenPintar, [5, 245])
+
     while(fin==True):
 
     	for event in pygame.event.get():
@@ -334,6 +339,8 @@ if __name__ == '__main__':
                         pygame.draw.circle(ventana,ROJO,(20,220),20)
                         info=fuente_J.render(iconoEuleriano,True,NEGRO)
                         ventana.blit(info,[15,213])
+                        pygame.draw.circle(ventana,ROJO,(20,260),20)
+                        ventana.blit(imagenPintar, [5, 245])
 
                         #Desactivacion
                     elif event.pos[0]<40 and event.pos[1]<40 and agregarNodo==True:
@@ -364,6 +371,8 @@ if __name__ == '__main__':
                         pygame.draw.circle(ventana,ROJO,(20,220),20)
                         info=fuente_J.render(iconoEuleriano,True,NEGRO)
                         ventana.blit(info,[15,213])
+                        pygame.draw.circle(ventana,ROJO,(20,260),20)
+                        ventana.blit(imagenPintar, [5, 245])
 
                     elif event.pos[0]<40 and event.pos[1]>40 and event.pos[1]<80 and agregarArista==True:
                          agregarArista=False
@@ -392,6 +401,8 @@ if __name__ == '__main__':
                         pygame.draw.circle(ventana,ROJO,(20,220),20)
                         info=fuente_J.render(iconoEuleriano,True,NEGRO)
                         ventana.blit(info,[15,213])
+                        pygame.draw.circle(ventana,ROJO,(20,260),20)
+                        ventana.blit(imagenPintar, [5, 245])
 
                     elif event.pos[0]<40 and event.pos[1]>80 and event.pos[1]<120 and visitar==True:
                          visitar=False
@@ -427,6 +438,8 @@ if __name__ == '__main__':
                         pygame.draw.circle(ventana,ROJO,(20,220),20)
                         info=fuente_J.render(iconoEuleriano,True,NEGRO)
                         ventana.blit(info,[15,213])
+                        pygame.draw.circle(ventana,ROJO,(20,260),20)
+                        ventana.blit(imagenPintar, [5, 245])
 
                     elif event.pos[0]<40 and event.pos[1]>120 and event.pos[1]<160 and conexo==True:
                          conexo=False
@@ -461,6 +474,9 @@ if __name__ == '__main__':
                         pygame.draw.circle(ventana,ROJO,(20,220),20)
                         info=fuente_J.render(iconoEuleriano,True,NEGRO)
                         ventana.blit(info,[15,213])
+                        pygame.draw.circle(ventana,ROJO,(20,260),20)
+                        ventana.blit(imagenPintar, [5, 245])
+
                     elif event.pos[0]<40 and event.pos[1]>160 and event.pos[1]<200 and bipartito==True:
                         bipartito=False
                         pygame.draw.circle(ventana,ROJO,(20,180),20)
@@ -493,12 +509,58 @@ if __name__ == '__main__':
                         pygame.draw.circle(ventana,VERDE,(20,220),20)
                         info=fuente_J.render(iconoEuleriano,True,NEGRO)
                         ventana.blit(info,[15,213])
+                        pygame.draw.circle(ventana,ROJO,(20,260),20)
+                        ventana.blit(imagenPintar, [5, 245])
 
                     elif event.pos[0]<40 and event.pos[1]>200 and event.pos[1]<240 and euleriano==True:
                         euleriano=False
                         pygame.draw.circle(ventana,ROJO,(20,220),20)
                         info=fuente_J.render(iconoEuleriano,True,NEGRO)
                         ventana.blit(info,[15,213])
+
+                    # Colorear grafo
+                    elif event.pos[0]<40 and event.pos[1]>240 and event.pos[1]<280 and colorearGrafo==False:
+                        agregarArista=False
+                        agregarNodo=False
+                        visitar=False
+                        conexo=False
+                        euleriano=False
+                        bipartito=False
+                        colorearGrafo=True
+                        pygame.draw.rect(ventana, NEGRO, [200,6,700,30])
+                        mjs="¿Tu grafo sera Euleriano?"
+                        fuente_texto=pygame.font.Font(None,25)
+                        info=fuente_texto.render(mjs,True,BLANCO)
+                        ventana.blit(info,[500,8])
+                        pygame.draw.circle(ventana,ROJO,(20,60),20)
+                        ventana.blit(imagenArista, [5, 58])
+                        pygame.draw.circle(ventana,ROJO,(20,20),20)
+                        ventana.blit(imagenNodo, [10, 10])
+                        pygame.draw.circle(ventana,ROJO,(20,100),20)
+                        ventana.blit(imagenvisitar, [5, 80])
+                        pygame.draw.circle(ventana,ROJO,(20,140),20)
+                        info=fuente_J.render(iconoConexo,True,NEGRO)
+                        ventana.blit(info,[15,135])
+                        pygame.draw.circle(ventana,ROJO,(20,180),20)
+                        ventana.blit(imagenbipartido, [5, 170])
+                        pygame.draw.circle(ventana,ROJO,(20,220),20)
+                        info=fuente_J.render(iconoEuleriano,True,NEGRO)
+                        ventana.blit(info,[15,213])
+                        pygame.draw.circle(ventana,VERDE,(20,260),20)
+                        ventana.blit(imagenPintar, [5, 245])
+                        nodosConEtiqueta,aristaConEtiquetas=actualizar(nodos,aristas)
+                        nodosColoreados=colorearMapa(nodosConEtiqueta,aristaConEtiquetas)
+                        for indexNodo in range(len(nodos)):
+                            pygame.draw.circle(ventana,
+                                nodosColoreados[indexNodo],
+                                nodos[indexNodo],
+                                20)  
+                    
+
+                    elif event.pos[0]<40 and event.pos[1]>240 and event.pos[1]<280 and colorearGrafo==True:
+                        colorearGrafo=False
+                        pygame.draw.circle(ventana,ROJO,(20,260),20)
+                        ventana.blit(imagenPintar, [5, 245])
  ####################################################################################      
                     #Logica de los botones                        
                     elif (agregarNodo==True and event.pos[1] >60):
@@ -755,7 +817,6 @@ if __name__ == '__main__':
                                 break
                                     
             if event.type == pygame.KEYDOWN:
-                G=nx.Graph()
                 if event.key == pygame.K_a:
                     letraInicial=65
                     nodosConEtiqueta=[]
@@ -768,19 +829,16 @@ if __name__ == '__main__':
                         info=fuente_J.render(mjs,True,NEGRO)
                         ventana.blit(info,nodo)
                         letraInicial+=1
-                    G.add_nodes_from(nodosConEtiqueta)
                     for arista in aristas:
                         v1=nodosConEtiqueta[nodos.index(arista[0])] 
                         v2=nodosConEtiqueta[nodos.index(arista[1])]
                         aristaConEtiquetas.append([v1,v2])
-                    G.add_edges_from(aristaConEtiquetas)
                     nodosColoreados=colorearMapa(nodosConEtiqueta,aristaConEtiquetas)
                     for indexNodo in range(len(nodos)):
                         pygame.draw.circle(ventana,
                             nodosColoreados[indexNodo],
                             nodos[indexNodo],
                             20)  
-                    print(colorearMapa(nodosConEtiqueta,aristaConEtiquetas))
                     
                     
                 if event.key == pygame.K_v:
@@ -867,7 +925,6 @@ if __name__ == '__main__':
                 fuente_tutorial=pygame.font.Font(None,18)
                 info=fuente_tutorial.render(mjs,True,BLANCO)
                 ventana.blit(info,[320,15])
-
                 mjs="Seleccionar"
                 fuente_J=pygame.font.Font(None,32)
                 info=fuente_J.render(mjs,True,BLANCO)
@@ -918,6 +975,13 @@ if __name__ == '__main__':
                         mjs="Verificar"
                         fuente_texto=pygame.font.Font(None,25)
                         info=fuente_texto.render(mjs,True,NEGRO)
-                        ventana.blit(info,[223,13])
-
+                        ventana.blit(info,[223,13])    
+            if colorearGrafo==True:
+                pygame.draw.rect(ventana, NEGRO, [1000,2,1200,40])
+                pygame.draw.rect(ventana, NEGRO, [200,2,800,40])
+                pygame.draw.rect(ventana, BLANCO, [200,2,800,40],5,10)
+                mjs="Grafo Pintado"
+                fuente_tutorial=pygame.font.Font(None,28)
+                info=fuente_tutorial.render(mjs,True,BLANCO)
+                ventana.blit(info,[550,15])
             pygame.display.flip()
